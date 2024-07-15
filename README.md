@@ -3,7 +3,7 @@ CRM Frontend Service
 
 For installation of libraries:
 ```
-yarn add .
+yarn install
 or
 npm install
 ```
