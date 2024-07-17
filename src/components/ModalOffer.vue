@@ -161,7 +161,7 @@ export default {
     ]),
     async onSubmit(event) {
       event.preventDefault()
-
+      
       console.log(JSON.stringify(this.getOffer));
 
       await axios.put(`/offers`, JSON.stringify(this.getOffer), this.getConf)
@@ -173,6 +173,7 @@ export default {
         });
 
       console.log(JSON.stringify(this.getOffer));
+      this.$root.$emit('bv::hide::modal', 'offer-modal-edit')
     },
   }
 };

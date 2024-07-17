@@ -14,7 +14,7 @@
             class="mb-0"
           >
             <b-input-group size="sm">
-              <b-form-input id="filter-input" v-model="filter" type="search" placeholder="Type to Search"></b-form-input>
+              <b-form-input id="filter-input" v-model.trim="filter" type="search" placeholder="Type to Search"></b-form-input>
               <b-input-group-append>
                 <b-button :disabled="!filter" @click="filter = ''">Clear</b-button>
               </b-input-group-append>
@@ -37,7 +37,7 @@
         :current-page="currentPage"
         :per-page="perPage"
         :filter="filter"
-        :filter-included-fields="filterOn"
+        :filter-ignored-fields="filterOn"
         @filtered="onFiltered"
       >
         <template #head()="data">
@@ -92,6 +92,7 @@
       scrollable 
       hide-footer 
       bg-dark 
+      v-b-modal.modal-offer-editing
       :title="modalTitle" 
       @hide="closeEditModal">
         <modal-offer 
@@ -174,7 +175,7 @@ export default {
       perPage: 10,
       pageOptions: [10, 50, 100],
       filter: null,
-      filterOn: [],
+      filterOn: ['dateCreated', 'currency.symbol', 'amount', 'totalAmount', 'actions'],
       modalTitle: ""
     };
   },
@@ -197,7 +198,6 @@ export default {
       "setOffer"
     ]),
     onFiltered(filteredItems) {
-      // Trigger pagination to update the number of buttons/pages due to filtering
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
     },
@@ -208,13 +208,9 @@ export default {
     },
     closeEditModal() {
       this.modalTitle = '';
-      this.setOffer(null);
-    },
-    async actionLink(item, button){
-      
-    },
-    infoOk(){
-
+      //this.$root.$emit('bv::hide::modal', 'offer-modal-edit', button)
+      //this.$refs['offer-modal-edit'].toggle('#toggle-btn')
+      //this.setOffer(null);
     }
   }
 };

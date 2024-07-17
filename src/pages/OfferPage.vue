@@ -4,26 +4,26 @@
     <!-- Table -->
     <div class="d-flex justify-content-center mb-3">
       <b-spinner v-if="loading" />
-      <table-offer 
+      <table-offers 
       :offers="offers" 
       :offerStatus="offerStatus" 
       :customers="customers" 
       :currencies="currencies"
       :brands="brands" 
       :costingTypes="costingTypes" 
-      v-else></table-offer>
+      v-else></table-offers>
     </div>
   </div>
 </template>
 
 <script>
 
-import TableOffer from "../components/TableOffer.vue";
+import TableOffers from "../components/TableOffers.vue";
 import axios from "axios";
 import { mapGetters } from "vuex";
 
 export default {
-  components: { TableOffer },
+  components: { TableOffers },
   data() {
     return {
       loading: true,
