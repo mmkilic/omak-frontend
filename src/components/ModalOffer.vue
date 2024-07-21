@@ -10,11 +10,7 @@
           </b-col>
           <b-col class="p-2">
             <b-form-group id="input-group-2" label-for="input-2" label="Durum:" label-size="sm" label-cols="4" label-cols-lg="4">
-              <b-form-select id="input-2" v-model="offer.status" class="mb-3" disabled-field="notEnabled">
-                <option v-for="theStatus in offerStatus" :value="theStatus[0]">
-                  {{ theStatus[1] }}
-                </option>
-              </b-form-select>
+              <b-form-input id="input-2" v-model="offer.status" size="sm" disabled></b-form-input>
             </b-form-group>
           </b-col>
         </b-form-row>
@@ -39,7 +35,7 @@
         <b-form-row>
           <b-col class="p-2">
             <b-form-group id="input-group-5" label-for="input-group-5" label="Oluşturma Tarihi:" label-size="sm" label-cols="4" label-cols-lg="4">
-              <b-form-input id="input-5" v-model="compDateCreated" type="date" size="sm" disabled></b-form-input>
+              <b-form-datepicker id="input-5" v-model="offer.dateCreated" size="sm" dark value-as-date></b-form-datepicker>
             </b-form-group>
           </b-col>
           <b-col class="p-2">
@@ -119,7 +115,7 @@ export default {
   components: {
     TableOfferLine
   },
-  props: ["offerStatus", "customers", "currencies", "brands", "costingTypes"],
+  props: ["modalEdit", "customers", "currencies", "brands", "costingTypes"],
   data() {
     return {
       contacts: null
@@ -149,11 +145,8 @@ export default {
       set(val){
         this.setOffer(val);
       }
-    },
-
-    compDateCreated(){
-      return this.getOffer.dateCreated.substring(0,10);
     }
+
   },
   methods: {
     ...mapMutations([
@@ -161,19 +154,27 @@ export default {
     ]),
     async onSubmit(event) {
       event.preventDefault()
-      
-      console.log(JSON.stringify(this.getOffer));
 
-      await axios.put(`/offers`, JSON.stringify(this.getOffer), this.getConf)
+      if(this.modalEdit){
+        await axios.put(`/offers`, JSON.stringify(this.getOffer), this.getConf)
         .then((response) => {
           this.setOffer(response.data);
         })
         .catch((e) => {
           console.log(e);
         });
+      }
+      else{
+        await axios.post(`/offers`, JSON.stringify(this.getOffer), this.getConf)
+        .then((response) => {
+          this.setOffer(response.data);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+      }
 
-      console.log(JSON.stringify(this.getOffer));
-      this.$root.$emit('bv::hide::modal', 'offer-modal-edit')
+      this.$root.$emit('bv::hide::modal', 'offer-modal')
     },
   }
 };

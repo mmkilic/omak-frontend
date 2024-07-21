@@ -40,7 +40,6 @@ export default {
     try {
       const res = await Promise.all([
         axios.get("/offers", this.getConf),
-        axios.get("/enums/offer-status", this.getConf),
         axios.get("/customers", this.getConf),
         axios.get("/currencies", this.getConf),
         axios.get("/product-brands", this.getConf),
@@ -49,11 +48,10 @@ export default {
       const data = res.map((res) => res.data);
 
       this.offers = data[0];
-      this.offerStatus = data[1];
-      this.customers = data[2];
-      this.currencies = data[3];
-      this.brands = data[4];
-      this.costingTypes = data[5];
+      this.customers = data[1];
+      this.currencies = data[2];
+      this.brands = data[3];
+      this.costingTypes = data[4];
 
       this.loading = false;
     } catch {

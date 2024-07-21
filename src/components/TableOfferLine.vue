@@ -17,6 +17,10 @@
           <span style="font-size:16px">{{ data.label }}</span>
         </template>
 
+        <template #cell(index)="data">
+          {{ data.index + 1 }}
+        </template>
+
         <template #cell(productCode)="data">
           <b-form-input class="border-0 no-shadow p-1" type="text" v-model="offer.offerLines[data.index].productCode"></b-form-input>
         </template>
@@ -110,6 +114,10 @@ export default {
   data() {
     return {
       fields: [
+      {
+          key: "index",
+          label: "Idx"
+        },
         {
           key: "productCode",
           label: "Ürün Kodu"
@@ -180,8 +188,6 @@ export default {
       "setOffer"
     ]),
     addRowHandler(event) {
-      //event.preventDefault()
-      console.log(this.offer.offerLines);
       this.offer.offerLines.push({id: 0});
     },
     removeRowHandler(index) {

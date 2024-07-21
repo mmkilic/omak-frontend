@@ -4,6 +4,11 @@
 
       <!-- Top Fillter Area -->
       <b-row>
+        <b-col lg="2" class="my-1">
+          <b-button-group>
+            <b-button @click="newOfferModal">Yeni Teklif</b-button>
+          </b-button-group>
+        </b-col>
         <b-col lg="10" class="my-1">
           <b-form-group
             label="Filter"
@@ -31,7 +36,7 @@
         small
         responsive="sm"
         show-empty
-        sort-icon-left
+        sort-icon-right
         :items="offers"
         :fields="fields"
         :current-page="currentPage"
@@ -43,10 +48,21 @@
         <template #head()="data">
           <span style="font-size:16px">{{ data.label }}</span>
         </template>
+        <template #cell(index)="data">
+          {{ data.index + 1 }}
+        </template>
+        <template #cell(dateCreated)="data">
+          {{ data.item.dateCreated.split('T')[0] }}
+        </template>
         <template #cell(actions)="row">
-          <b-button size="sm" @click="openEditModal(row.item, $event.target)" class="mr-1">
-            <!-- Edit -->
-            <i class="ti-pencil"></i>
+          <b-button size="sm" @click="editModalOpen(row.item, $event.target)" class="mr-1">
+            <i class="ti-pencil" title="Düzenle"></i>
+          </b-button>
+          <b-button size="sm" @click="offerToOrder(row.item)" class="mr-1">
+            <i class="ti-wand" title="Sipariş"></i>
+          </b-button>
+          <b-button size="sm" @click="cancelOffer(row.item)" class="mr-1">
+            <i class="ti-na" title="İptal"></i>
           </b-button>
         </template>
       </b-table>
@@ -86,17 +102,17 @@
 
       <!-- Info modal -->
       <b-modal 
-      id="offer-modal-edit" 
+      id="offer-modal" 
       class="bg-variant-dark" 
       size="xl" 
       scrollable 
       hide-footer 
       bg-dark 
-      v-b-modal.modal-offer-editing
+      v-b-modal.modal-offer
       :title="modalTitle" 
-      @hide="closeEditModal">
+      @hide="closeModal">
         <modal-offer 
-        :offerStatus="offerStatus" 
+        :modalEdit="modalEdit"
         :customers="customers"
         :currencies="currencies"
         :brands="brands" 
@@ -111,15 +127,20 @@
 
 import ModalOffer from '../components/ModalOffer.vue';
 import { mapGetters, mapMutations } from "vuex";
+import axios from "axios";
 
 export default {
   components: {
-    ModalOffer
+    ModalOffer,
   },
-  props: ["offers", "offerStatus", "customers", "currencies", "brands", "costingTypes"],
+  props: ["offers", "customers", "currencies", "brands", "costingTypes"],
   data() {
     return {
       fields: [
+        {
+          key: "Index",
+          label: "Idx"
+        },
         {
           key: "id",
           label: "Teklif Numarası",
@@ -176,19 +197,16 @@ export default {
       pageOptions: [10, 50, 100],
       filter: null,
       filterOn: ['dateCreated', 'currency.symbol', 'amount', 'totalAmount', 'actions'],
-      modalTitle: ""
+      modalTitle: "",
+      modalEdit: false,
+      offerNew: null
     };
   },
   mounted() {
-    // Set the initial number of items
     this.totalRows = this.offers.length;
-    
   },
   computed: {
     ...mapGetters(['getConf', 'getOffer']),
-    customComp(){
-
-    }
   },
   created: async function () {
     
@@ -201,16 +219,78 @@ export default {
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
     },
-    openEditModal(item, button) {
+    editModalOpen(item, button) {
       this.modalTitle = `Teklif Numarası: ${item.id}`;
+      this.modalEdit = true;
       this.setOffer(item);
-      this.$root.$emit('bv::show::modal', "offer-modal-edit", button);
+      this.$root.$emit('bv::show::modal', "offer-modal", button);
     },
-    closeEditModal() {
+    closeModal() {
       this.modalTitle = '';
-      //this.$root.$emit('bv::hide::modal', 'offer-modal-edit', button)
-      //this.$refs['offer-modal-edit'].toggle('#toggle-btn')
-      //this.setOffer(null);
+      this.modalEdit = false;
+      this.$router.go()
+    },
+    async offerToOrder(item) {
+      await axios.put(`/offers/order?offerId=${item.id}`, this.getConf)
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+      
+      this.$router.push('/order');
+    },
+    async cancelOffer(item) {
+      await axios.delete(`/offers?offerId=${item.id}`, this.getConf)
+      .then((response) => {
+        item = response.data;
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+      this.$router.go()
+    },
+    newOfferModal() {
+      this.modalTitle = 'New Offer';
+      this.modalEdit = false;
+      this.setOffer({
+          "id": 0,
+          "taxRate": 0,
+          "status": "OPEN",
+          "dateCreated": "",
+          "customer": {
+              "id": 0
+          },
+          "currency": {
+              "id": 0
+          },
+          "contact": {
+              "id": 0
+          },
+          "salesman": {
+              "id": 0
+          },
+          "offerLines": [
+            {
+              "id": 0,
+              "productCode": "",
+              "productDescription": "",
+              "quantity": 0,
+              "duration": "",
+              "purchasingCost": 0,
+              "costingType": "",
+              "factor": 0,
+              "productBrand": {
+                  "id": 0
+              }
+            }
+          ],
+          "taxAmount": 0,
+          "totalAmount": 0,
+          "amount": 0
+      });
+      this.$root.$emit('bv::show::modal', "offer-modal");
     }
   }
 };
