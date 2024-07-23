@@ -19,3 +19,8 @@ For missing sass libraries
 ```
 npm install -D sass-loader@^10 sass
 ```
+
+For building
+```
+yarn build
+```

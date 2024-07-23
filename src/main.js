@@ -8,7 +8,8 @@ import "vue-notifyjs/themes/default.css";
 
 import axios from "axios";
 
-axios.defaults.baseURL = 'http://localhost:8080/api-crm';
+//axios.defaults.baseURL = 'http://localhost:8080/api-crm';
+axios.defaults.baseURL = 'http://13.51.121.98/api-crm';
 
 Vue.use(PaperDashboard);
 

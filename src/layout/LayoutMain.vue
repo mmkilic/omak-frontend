@@ -1,6 +1,7 @@
 <template>
   <div class="wrapper">
     <side-bar>
+      <mobile-menu slot="content"></mobile-menu>
       <template slot="links">
         <sidebar-link to="/main" name="Main" icon="ti-panel"/>
         <sidebar-link v-if="off" to="/offer" name="Teklifler" icon="ti-bell"/>
@@ -20,11 +21,13 @@
 import LayoutHeader from "./LayoutHeader.vue";
 import LayoutFooter from "./LayoutFooter.vue";
 import LayoutContent from "./LayoutContent.vue";
+import MobilMenu from "./MobileMenu.vue";
 export default {
   components: {
     LayoutHeader,
     LayoutFooter,
-    LayoutContent
+    LayoutContent,
+    MobilMenu
   },
   data(){
     return{
