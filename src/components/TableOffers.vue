@@ -58,6 +58,9 @@
           <b-button size="sm" @click="editModalOpen(row.item, $event.target)" class="mr-1">
             <i class="ti-pencil" title="Düzenle"></i>
           </b-button>
+          <b-button size="sm" @click="downloadOfferLetter(row.item)" class="mr-1">
+            <i class="ti-download" title="Sipariş Mektubu"></i>
+          </b-button>
           <b-button size="sm" @click="offerToOrder(row.item)" class="mr-1">
             <i class="ti-wand" title="Sipariş"></i>
           </b-button>
@@ -224,6 +227,28 @@ export default {
       this.modalEdit = true;
       this.setOffer(item);
       this.$root.$emit('bv::show::modal', "offer-modal", button);
+    },
+    async downloadOfferLetter(item) {
+      let conf = this.getConf;
+      conf.responseType = 'blob';
+      conf.maxBodyLength = 'Infinity';
+      conf.url = `/offers/excel?offerId=${item.id}`;
+      conf.method = 'post';
+      console.log(conf);
+
+      await axios.request(conf)
+      .then((response) => {
+        const url = URL.createObjectURL(new Blob([response.data]))
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `offer-letter-${item.id}.xlsx`;
+        document.body.appendChild(link);
+        link.click();
+        URL.revokeObjectURL(url);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
     },
     closeModal() {
       this.modalTitle = '';
